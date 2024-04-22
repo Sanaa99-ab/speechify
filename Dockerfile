@@ -2,10 +2,13 @@
 FROM python:3.9-slim
 
 # Install system dependencies
+
 RUN apt-get update && apt-get install -y \
-    portaudio19-dev \
     libasound2-dev \
+    alsa-utils \
+    portaudio19-dev \
     && rm -rf /var/lib/apt/lists/*
+
 
 # Set the working directory to /app in the container
 WORKDIR /app
