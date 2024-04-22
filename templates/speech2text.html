@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversion de la voix en texte</title>
+    <link rel="stylesheet" href="..//static/speech2text.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <style>
+        /* Styles du premier code */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0ece2;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #c7b198;
+            padding: 10px 20px;
+        }
+
+        .btn {
+            background-color: #596e79;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        .btn:hover {
+            background-color: #a7947d;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .logo img {
+            width: 100px;
+            margin-right: 10px;
+        }
+
+        .app-name {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .header-buttons button {
+            padding: 10px 20px;
+            background-color: #596e79;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-bottom: 20px;
+        }
+
+        .header-buttons button:hover {
+            background-color: #a7947d;
+        }
+
+        /* Styles spécifiques à la première section */
+        .section {
+            margin-bottom: 20px;
+            padding: 20px;
+            background-color: #dfd3c3; /* Couleur du corps */
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .section label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .section input[type="file"],
+        .section select {
+            width: 100%;
+            padding: 5px;
+            border: 1px solid #c7b198; /* Couleur des bordures */
+            border-radius: 3px;
+            box-sizing: border-box;
+        }
+
+        .section .btn {
+            background-color: #596e79; /* Couleur du bouton */
+        }
+
+        .section .btn:hover {
+            background-color: #a7947d; /* Couleur du bouton au survol */
+        }
+
+        /* Ajustements spécifiques à la première section */
+        .section .language-box {
+            margin-bottom: 10px; /* Ajout d'un petit espace sous la barre de langue */
+        }
+
+        .section .duration-box input[type="number"] {
+            height: 30px; /* Augmentation de la hauteur du champ de durée */
+            width: 7%; 
+        }
+
+        /* Nouveaux styles */
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .result-box {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            grid-column: span 2;
+        }
+
+        .text-area {
+            min-height: 100px;
+            border: 1px solid #c7b198;
+            border-radius: 5px;
+            padding: 10px;
+            overflow-y: auto;
+        }
+
+        /* Style pour le titre */
+        .title {
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">
+            <img src="../static/images/logo.avif" alt="Speechify Logo">
+            <span class="app-name">Speechify</span>
+        </div>
+        <div class="header-buttons">
+            <button><a id="home-btn" href="/dashboard">Home</a></button>
+            <button><a id="logout-btn" href="/">Logout</a></button>
+        </div>
+    </header>
+    <div class="title">Conversion de la voix en texte</div>
+    <div class="grid-container">
+        <div class="section">
+            <!-- Première section -->
+            <h1>Importer audio</h1>
+            <form id="audioForm2" action="/upload" method="post" enctype="multipart/form-data">
+                <label for="audio_file">Choisir un fichier audio :</label>
+                <input type="file" id="audio_file" name="file" accept=".wav">
+                <br>
+                <label for="model" >Choisir un modèle de langue :</label>
+                <select id="model" name="model">
+                    {% for model_name, model_code in models.items() %}
+                        <option value="{{ model_name }}">{{ model_name }}</option>
+                    {% endfor %}
+                </select>
+                <br>
+                <div>
+                <button type="submit" class="btn">Convertir</button>
+            </div>
+            </form>
+        </div>
+    
+        <!-- Deuxième section -->
+        <div class="section">
+            <h1>Enregistrer audio</h1>
+            <form id="audioForm" action="/upload" method="post" enctype="multipart/form-data">
+                <div class="language-box">
+                    <label for="model">Choisir le modèle:</label>
+                    <select id="model" name="model">
+                        {% for model_name, model_code in models.items() %}
+                            <option value="{{ model_code }}">{{ model_name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="duration-box">
+                    <label for="duration">Durée de l'enregistrement (secondes):</label>
+                    <input type="number" id="duration" name="duration" value="5.0" step="0.1">
+                </div>
+                <div class="buttons">
+                    <button type="submit">Enregistrer</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Partie "Texte converti" -->
+        <div id="result" class="result-box">
+            <h3>Texte converti:</h3>
+            <div id="result-text" class="text-area"></div>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            $('#audioForm').submit(function(event){
+                event.preventDefault();
+                var formData = new FormData($(this)[0]);
+
+                $.ajax({
+                    url: '/convert_audio',
+                    type: 'POST',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response){
+                        $('#result-text').text(response.text);
+                    },
+                    error: function(xhr, status, error){
+                        $('#result-text').text("Erreur: " + xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+
+    <script>
+        // Utilisation de JavaScript pour afficher le résultat de la conversion
+        document.querySelector('#audioForm2').addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch('/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const text = await response.text();
+            document.getElementById('result-text').innerText = text;
+        });
+    </script>
+</body>
+</html>
